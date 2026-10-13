@@ -8,85 +8,97 @@ generator cliente{
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
+model cliente {
+  idCliente Int @id @default(autoincrement())
+  nombre String
+  apellido String
+  cedula String @unique
+  telefono String
+  correo String @unique
+  activo Boolean @default(true)
 
+  paquete paquete[]
+  Direccion Direccion[]
+}
+model estadoPaquete{
+  idEstado Int  @id @default(autoincrement())
+  nombreEstado String @unique
+  Descripcion String?
+  activo Boolean @default(true)
+  paquete  paquete[]
+}
 model paquete  {
-  idPaquete int @idPaquete @default(autoincrement())
-    Tracking string @unique
-    Descripcion string
-    peso decimal
-    dimensiones string
-    valorDeclarado decimal
-    idCliente int 
-    idEstado int
+  idPaquete Int @id @default(autoincrement())
+    Tracking String @unique
+    Descripcion String
+    peso Decimal
+    dimensiones String
+    valorDeclarado Decimal
+    idCliente Int 
+    idEstado Int
     fechaRecepcion DateTime @default(now())
 
-    cliente cliente @relation(fields: [idCliente], reference: [idCliente])
-    estado estadoPaquete @relation:(fields: [idEstado], reference: [idEstado])
+    cliente cliente @relation(fields: [idCliente], references: [idCliente])
+    estado estadoPaquete @relation(fields: [idEstado], references: [idEstado])
     envio Envio[]
 }
 
-model envio {
-  idEnvio int @idEnvio @default(autoincrement())
-  idPaquete int 
-  idDireccionDestino int
+model Envio {
+  idEnvio Int @id @default(autoincrement())
+  idPaquete Int 
+  idDireccionDestino Int
   fechaEnvio DateTime @default(now())
   fechaEntregaEstimada DateTime
   fechaEntregaReal DateTime?
-  costoEnvio decimal
-  idRepartidor int?
+  costoEnvio Decimal
+  idRepartidor Int?
 
-  paquete  paquete @relation(fields: [idPaquete], reference: [idPaquete])
-  direccionDestino Direccion @relation(fields: [idDireccionDestino], reference: [idDireccion]) 
-  Repartidor Empleado? @relation(fields: [idRepartidor], reference: [idEmpleado])
+  paquete  paquete @relation(fields: [idPaquete], references: [idPaquete])
+  direccionDestino Direccion @relation(fields: [idDireccionDestino], references: [idDireccion]) 
+  Repartidor Empleado? @relation(fields: [idRepartidor], references: [idEmpleado])
   pagos pago[]
 }
 
 model Direccion {
-  idDireccion int @id @default(autoincrement())
-  idCliente int 
-  calle string
-  numero string 
-  sector string
-  ciudad string
-  provincia string
-  referencia string?
-  tipoDireccion string
+  idDireccion Int @id @default(autoincrement())
+  idCliente Int 
+  calle String
+  numero String 
+  sector String
+  ciudad String
+  provincia String
+  referencia String?
+  tipoDireccion String
 
-  cliente cliente @relation(fields: [idCliente], reference: [idCliente])
+  cliente cliente @relation(fields: [idCliente], references: [idCliente])
   Envio  Envio[]
 }
 
 model pago{
-  idPago int  @id @default(autoincrement())
-  idEnvio int 
-  monto decimal
-  metodoPago string 
+  idPago Int  @id @default(autoincrement())
+  idEnvio Int 
+  monto Decimal
+  metodoPago String 
   fechaPago DateTime @default(now())
-  estadoPago  string
-  referencia string?
-  Envio  Envio  @relation(fields: [idEnvio], reference: [idEnvio])
+  estadoPago  String
+  referencia String?
+  Envio  Envio  @relation(fields: [idEnvio], references: [idEnvio])
 }
 
 model Empleado{
-  idEmpleado int @id @default(autoincrement())
-  nombre string 
-  apellido string
-  cedula string @unique
-  telefono string
-  correo string @unique 
-  cargo string 
-  activo boolean @default(true)
+  idEmpleado Int @id @default(autoincrement())
+  nombre String 
+  apellido String
+  cedula String @unique
+  telefono String
+  correo String @unique 
+  cargo String 
+  activo Boolean @default(true)
 
   Envio   Envio[]
 }
 
-model estadoPaquete{
-  idEstado int  @id @default(autoincrement())
-  nombreEstado string @unique
-  Descripcion string?
-  activo boolean @default(true)
-  paquete  paquete[]
-}
+
 
 datasource db {
   provider = "postgresql"
