@@ -3,11 +3,93 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
-generator client {
+generator cliente{
+
   provider = "prisma-client"
   output   = "../src/generated/prisma"
+}
+
+model paquete  {
+  idPaquete int @idPaquete @default(autoincrement())
+    Tracking string @unique
+    Descripcion string
+    peso decimal
+    dimensiones string
+    valorDeclarado decimal
+    idCliente int 
+    idEstado int
+    fechaRecepcion DateTime @default(now())
+
+    cliente cliente @relation(fields: [idCliente], reference: [idCliente])
+    estado estadoPaquete @relation:(fields: [idEstado], reference: [idEstado])
+    envio Envio[]
+}
+
+model envio {
+  idEnvio int @idEnvio @default(autoincrement())
+  idPaquete int 
+  idDireccionDestino int
+  fechaEnvio DateTime @default(now())
+  fechaEntregaEstimada DateTime
+  fechaEntregaReal DateTime?
+  costoEnvio decimal
+  idRepartidor int?
+
+  paquete  paquete @relation(fields: [idPaquete], reference: [idPaquete])
+  direccionDestino Direccion @relation(fields: [idDireccionDestino], reference: [idDireccion]) 
+  Repartidor Empleado? @relation(fields: [idRepartidor], reference: [idEmpleado])
+  pagos pago[]
+}
+
+model Direccion {
+  idDireccion int @id @default(autoincrement())
+  idCliente int 
+  calle string
+  numero string 
+  sector string
+  ciudad string
+  provincia string
+  referencia string?
+  tipoDireccion string
+
+  cliente cliente @relation(fields: [idCliente], reference: [idCliente])
+  Envio  Envio[]
+}
+
+model pago{
+  idPago int  @id @default(autoincrement())
+  idEnvio int 
+  monto decimal
+  metodoPago string 
+  fechaPago DateTime @default(now())
+  estadoPago  string
+  referencia string?
+  Envio  Envio  @relation(fields: [idEnvio], reference: [idEnvio])
+}
+
+model Empleado{
+  idEmpleado int @id @default(autoincrement())
+  nombre string 
+  apellido string
+  cedula string @unique
+  telefono string
+  correo string @unique 
+  cargo string 
+  activo boolean @default(true)
+
+  Envio   Envio[]
+}
+
+model estadoPaquete{
+  idEstado int  @id @default(autoincrement())
+  nombreEstado string @unique
+  Descripcion string?
+  activo boolean @default(true)
+  paquete  paquete[]
 }
 
 datasource db {
   provider = "postgresql"
 }
+
+
