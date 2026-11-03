@@ -1,45 +1,52 @@
 
-import { ApiProperty } from '@nestjs/swagger';
+
 import {
-  IsInt,
-  IsNumber,
-  IsPositive,
-  IsString,
-  MinLength,
-} from 'class-validator';
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 
-export class CreatePaqueteDTO {
+import { PaqueteService } from './paquete.service.js';
+import { CreatePaqueteDTO } from './dto/CreatepaqueteDTO.js';
+import { UpdatePaqueteDTO } from './dto/UpdatepaqueteDTO.js';
 
-  @IsString()
-  @ApiProperty()
-  Tracking: string;
+@Controller('paquetes')
+export class PaqueteController {
 
-  @IsString()
-  @MinLength(3)
-  @ApiProperty()
-  Descripcion: string;
+  constructor(
+    private readonly paqueteService: PaqueteService,
+  ) {}
 
-  @IsNumber()
-  @IsPositive()
-  @ApiProperty()
-  peso: number;
+  // Listar todos los paquetes
+  @Get()
+  async listarPaquetes() {
+    return this.paqueteService.listarPaquetes();
+  }
 
-  @IsString()
-  @ApiProperty()
-  dimensiones: string;
+  // Crear un paquete
+  @Post()
+  async crearPaquete(@Body() datosPaquete: CreatePaqueteDTO) {
+    return this.paqueteService.createPaquete(datosPaquete);
+  }
 
-  @IsNumber()
-  @IsPositive()
-  @ApiProperty()
-  valorDeclarado: number;
+  // Buscar paquete por ID
+  @Get(':id')
+  async buscarPaquetePorId(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.paqueteService.buscarUnPaquete(id);
+  }
 
-  @IsInt()
-  @IsPositive()
-  @ApiProperty()
-  idCliente: number;
-
-  @IsInt()
-  @IsPositive()
-  @ApiProperty()
-  idEstado: number;
+  // Actualizar paquete
+  @Put(':id')
+  async actualizarPaquete(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() datosPaquete: UpdatePaqueteDTO,
+  ) {
+    return this.paqueteService.updatePaquete(id, datosPaquete);
+  }
 }
